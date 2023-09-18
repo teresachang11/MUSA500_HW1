@@ -1,0 +1,33 @@
+---
+title: "MUSA500 - HW1"
+author: "Chenxi Zhu, Teresa Chang, and Tiffany Luo "
+date: "Octobor 1,2023"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+## 1. Introduction
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2. Methods
+### 2.1 Data Cleaning
+### 2.2 Exploratory Data Analysis
+### 2.3 Multiple Regression Analysis
+### 2.4 Additional Analyses
+### 2.5 Software
+
+## 3. Results
+### 3.1 Exploratory Results   
+### 3.2 Regression Results
+### 3.3 Regression Assumption Checks
+### 3.4 Additional Models
+```{r}
+data <- read.csv("/Users/teresachang/Downloads/RegressionData.csv")
+```
+
+
+## 4. Discussion and Limitations
