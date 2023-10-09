@@ -13,6 +13,23 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r load_packages, warning = FALSE}
+options(scipen=10000000)
+
+library(tidyverse)
+library(kableExtra)
+library(caret)
+library(knitr) 
+library(pscl)
+library(plotROC)
+library(pROC)
+library(lubridate)
+library(scales)
+library(stargazer)
+library(cowplot)
+
+```
+
 ## 2. Methods
 ### 2.1 Data Cleaning
 ### 2.2 Exploratory Data Analysis
@@ -29,5 +46,37 @@ knitr::opts_chunk$set(echo = TRUE)
 data <- read.csv("/Users/teresachang/Downloads/RegressionData.csv")
 ```
 
+```{r}
+MedHouseValue = c('Median House Value', mean(data$MEDHVAL), sd(data$MEDHVAL))
+HH_poverty = c('# Households Living in Poverty', mean(data$NBELPOV100), sd(data$NBELPOV100))
+bachelor = c('% of Individuals with Bachelor’s Degrees or Higher', mean(data$PCTBACHMOR), sd(data$PCTBACHMOR))
+vacant = c('% of Vacant Houses', mean(data$PCTVACANT), sd(data$PCTVACANT))
+SingleHouse = c('% of Single House Units', mean(data$PCTSINGLES), sd(data$PCTSINGLES))
+
+table = as.data.frame(t(data.frame(
+              MedHouseValue,
+              HH_poverty,
+              bachelor,
+              vacant,
+              SingleHouse
+              )))
+
+colnames(table) = c("Variable", "Mean", "SD")
+
+table
+```
+
+```{r}
+MedHV = ggplot(data) +
+        geom_histogram(aes(MEDHVAL))
+
+MedHV
+```
+
+```{r}
+MedHV = ggplot(data) +
+        geom_histogram(aes(MEDHVAL))
+
+```
 
 ## 4. Discussion and Limitations
