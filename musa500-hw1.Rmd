@@ -28,6 +28,7 @@ library(scales)
 library(stargazer)
 library(cowplot)
 
+
 ```
 
 ## 2. Methods
@@ -69,14 +70,27 @@ table
 ```{r}
 MedHV = ggplot(data) +
         geom_histogram(aes(MEDHVAL))
+HHpov = ggplot(data) +
+        geom_histogram(aes(NBELPOV100))
+bach = ggplot(data) +
+        geom_histogram(aes(PCTBACHMOR))
+vacant = ggplot(data) +
+        geom_histogram(aes(PCTVACANT))
+SingleH = ggplot(data) +
+        geom_histogram(aes(PCTVACANT))
 
 MedHV
+HHpov
+bach
+vacant
+SingleH
+
 ```
 
 ```{r}
-MedHV = ggplot(data) +
-        geom_histogram(aes(MEDHVAL))
+
 
 ```
+
 
 ## 4. Discussion and Limitations
