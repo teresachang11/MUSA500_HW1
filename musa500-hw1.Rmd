@@ -27,7 +27,7 @@ library(lubridate)
 library(scales)
 library(stargazer)
 library(cowplot)
-
+library(ggpubr)
 
 ```
 
@@ -44,6 +44,7 @@ library(cowplot)
 ### 3.3 Regression Assumption Checks
 ### 3.4 Additional Models
 ```{r}
+#Teresa's path (does someone know how to use relative path in R lol?)
 data <- read.csv("/Users/teresachang/Downloads/RegressionData.csv")
 ```
 
@@ -77,7 +78,7 @@ bach = ggplot(data) +
 vacant = ggplot(data) +
         geom_histogram(aes(PCTVACANT))
 SingleH = ggplot(data) +
-        geom_histogram(aes(PCTVACANT))
+        geom_histogram(aes(PCTSINGLES))
 
 MedHV
 HHpov
@@ -88,9 +89,110 @@ SingleH
 ```
 
 ```{r}
+data$LNMEDHVAL <- log(data$MEDHVAL)
+data$LNPCBACHMORE <- log(1+data$PCTBACHMOR)
+data$LNNBELPOV100 <- log(data$NBELPOV100)
+data$LNPCTVACANT <- log(1+data$PCTVACANT)
+data$LNPCTSINGLES <- log(1+data$PCTSINGLES)
+
+```
+
+(from the instruction:
+c.	Note that the dependent variable does look more or less normal after the transformation 
+- LNMEDHVAL will be used as the dependent variable in the regression analysis. 
+- for the predictors, the logarithmic transformation only helps normalize the NBELPOV100 variable 
+- so we will use LNNBELPOV100 in the subsequent analyses 
+
+- The other variables have a large spike at zero after the transformations
+- we will use the original, untransformed PCBACHMORE, PCTVACANT, and PCTSINGLES variables in the regression
+
+```{r}
+LNMedHV = ggplot(data) +
+        geom_histogram(aes(LNMEDHVAL))
+LNHHpov = ggplot(data) +
+        geom_histogram(aes(LNNBELPOV100))
+LNbach = ggplot(data) +
+        geom_histogram(aes(LNPCBACHMORE))
+LNvacant = ggplot(data) +
+        geom_histogram(aes(LNPCTVACANT))
+LNSingleH = ggplot(data) +
+        geom_histogram(aes(LNPCTSINGLES))
+
+LNMedHV
+LNHHpov
+LNbach
+LNvacant
+LNSingleH
+
+```
+
+b.	Look at whether the relationship between the dependent variable and each of the predictors is linear.
+present all four scatter plots as a single figure.
+
+```{r}
+# create a new plotting window and set the plotting area into a 2*2 array
+par(mfrow = c(2, 2))
+
+plot(data$LNMEDHVAL, data$LNNBELPOV100)
+plot(data$LNMEDHVAL, data$PCTBACHMOR)
+plot(data$LNMEDHVAL, data$PCTVACANT)
+plot(data$LNMEDHVAL, data$PCTSINGLES)
 
 
 ```
 
+```{r}
+
+cor(data$LNMEDHVAL, data$LNNBELPOV100, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTBACHMOR, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTVACANT, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTSINGLES, method = c("pearson"), use = "complete.obs")
+
+```
+```{r}
+
+A <- ggscatter(data, x = "LNMEDHVAL", y = "LNNBELPOV100", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "LNMEDHVAL", ylab = "LNNBELPOV100")
+
+B <- ggscatter(data, x = "LNMEDHVAL", y = "PCTBACHMOR", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "LNMEDHVAL", ylab = "PCTBACHMOR")
+
+
+C <- ggscatter(data, x = "LNMEDHVAL", y = "PCTVACANT", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "LNMEDHVAL", ylab = "PCTVACANT")
+
+D <- ggscatter(data, x = "LNMEDHVAL", y = "PCTSINGLES", 
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "LNMEDHVAL", ylab = "PCTSINGLES")
+
+ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
+          labels = c("A", "B", "C", "D"),
+          ncol = 2, nrow = 2)
+```
+
+```{r}
+data %>% 
+  filter_if(~is.numeric(.), all_vars(!is.infinite(.)))
+
+
+cormatrix <- data[, c(4,6,7,11)]
+res <- cor(cormatrix)
+round(res, 2)
+```
+
+
+```{r}
+
+library(corrplot)
+corrplot(res, type = "upper", 
+         tl.col = "black", tl.srt = 45)
+```
 
 ## 4. Discussion and Limitations
