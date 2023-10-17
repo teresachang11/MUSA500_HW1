@@ -178,9 +178,10 @@ ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
 ```
 
 ```{r}
-data %>% 
-  filter_if(~is.numeric(.), all_vars(!is.infinite(.)))
-
+#data %>% 
+ # filter_if(~is.numeric(.), all_vars(!is.infinite(.)))
+data <- data %>% 
+  filter_all(all_vars(!is.infinite(.)))
 
 cormatrix <- data[, c(4,6,7,11)]
 res <- cor(cormatrix)
