@@ -1,14 +1,21 @@
 ---
 title: "MUSA500 - HW1"
 author: "Chenxi Zhu, Teresa Chang, and Tiffany Luo "
-date: "Octobor 1,2023"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
     toc_float: true
+    number_sections: true
     code_folding: hide
+editor_options: 
+  markdown: 
+    wrap: 80
+  chunk_output_type: inline
 ---
+
 ## 1. Introduction
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -32,20 +39,30 @@ library(ggpubr)
 ```
 
 ## 2. Methods
+
 ### 2.1 Data Cleaning
+
 ### 2.2 Exploratory Data Analysis
+
 ### 2.3 Multiple Regression Analysis
+
 ### 2.4 Additional Analyses
+
 ### 2.5 Software
 
 ## 3. Results
-### 3.1 Exploratory Results   
+
+### 3.1 Exploratory Results
+
 ### 3.2 Regression Results
+
 ### 3.3 Regression Assumption Checks
+
 ### 3.4 Additional Models
+
 ```{r}
 #Teresa's path (does someone know how to use relative path in R lol?)
-data <- read.csv("/Users/teresachang/Downloads/RegressionData.csv")
+data <- read.csv("RegressionData.csv")
 ```
 
 ```{r}
@@ -97,14 +114,15 @@ data$LNPCTSINGLES <- log(1+data$PCTSINGLES)
 
 ```
 
-(from the instruction:
-c.	Note that the dependent variable does look more or less normal after the transformation 
-- LNMEDHVAL will be used as the dependent variable in the regression analysis. 
-- for the predictors, the logarithmic transformation only helps normalize the NBELPOV100 variable 
-- so we will use LNNBELPOV100 in the subsequent analyses 
+(from the instruction: c. Note that the dependent variable does look more or
+less normal after the transformation - LNMEDHVAL will be used as the dependent
+variable in the regression analysis. - for the predictors, the logarithmic
+transformation only helps normalize the NBELPOV100 variable - so we will use
+LNNBELPOV100 in the subsequent analyses
 
-- The other variables have a large spike at zero after the transformations
-- we will use the original, untransformed PCBACHMORE, PCTVACANT, and PCTSINGLES variables in the regression
+-   The other variables have a large spike at zero after the transformations
+-   we will use the original, untransformed PCBACHMORE, PCTVACANT, and
+    PCTSINGLES variables in the regression
 
 ```{r}
 LNMedHV = ggplot(data) +
@@ -126,8 +144,8 @@ LNSingleH
 
 ```
 
-b.	Look at whether the relationship between the dependent variable and each of the predictors is linear.
-present all four scatter plots as a single figure.
+b.  Look at whether the relationship between the dependent variable and each of
+    the predictors is linear. present all four scatter plots as a single figure.
 
 ```{r}
 # create a new plotting window and set the plotting area into a 2*2 array
@@ -149,6 +167,7 @@ cor(data$LNMEDHVAL, data$PCTVACANT, method = c("pearson"), use = "complete.obs")
 cor(data$LNMEDHVAL, data$PCTSINGLES, method = c("pearson"), use = "complete.obs")
 
 ```
+
 ```{r}
 
 A <- ggscatter(data, x = "LNMEDHVAL", y = "LNNBELPOV100", 
@@ -187,7 +206,6 @@ cormatrix <- data[, c(4,6,7,11)]
 res <- cor(cormatrix)
 round(res, 2)
 ```
-
 
 ```{r}
 
