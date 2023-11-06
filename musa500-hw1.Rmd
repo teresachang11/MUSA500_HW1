@@ -14,29 +14,11 @@ editor_options:
   chunk_output_type: inline
 ---
 
-## 1. Introduction
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r load_packages, warning = FALSE}
-options(scipen=10000000)
-
-library(tidyverse)
-library(kableExtra)
-library(caret)
-library(knitr) 
-library(pscl)
-library(plotROC)
-library(pROC)
-library(lubridate)
-library(scales)
-library(stargazer)
-library(cowplot)
-library(ggpubr)
-
-```
+## 1. Introduction
 
 ## 2. Methods
 
@@ -52,23 +34,44 @@ library(ggpubr)
 
 ## 3. Results
 
+```{r load_packages, warning = FALSE, include=FALSE}
+options(scipen=10000000)
+
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(caret)
+library(knitr) 
+library(pscl)
+library(plotROC)
+library(pROC)
+library(lubridate)
+library(scales)
+library(stargazer)
+library(cowplot)
+library(ggpubr)
+library(sf)
+```
+
 ### 3.1 Exploratory Results
 
-### 3.2 Regression Results
-
-### 3.3 Regression Assumption Checks
-
-### 3.4 Additional Models
+#### 3.1.1 Summary Statistics
 
 ```{r}
-#Teresa's path (does someone know how to use relative path in R lol?)
 data <- read.csv("RegressionData.csv")
 ```
+
+The summary statistics reveals a diverse and complex socio-economic and housing
+landscape. The significant variability in median house values suggests a wide
+range of property prices, reflecting diverse regional housing markets and
+economic conditions. High standard deviations in the number of households living
+in poverty and the percentage of individuals with bachelor's degrees or higher
+indicate notable socio-economic disparities across different census block group.
 
 ```{r}
 MedHouseValue = c('Median House Value', mean(data$MEDHVAL), sd(data$MEDHVAL))
 HH_poverty = c('# Households Living in Poverty', mean(data$NBELPOV100), sd(data$NBELPOV100))
-bachelor = c('% of Individuals with Bachelor’s Degrees or Higher', mean(data$PCTBACHMOR), sd(data$PCTBACHMOR))
+bachelor = c('% with Bachelor’s Degrees or Higher', mean(data$PCTBACHMOR), sd(data$PCTBACHMOR))
 vacant = c('% of Vacant Houses', mean(data$PCTVACANT), sd(data$PCTVACANT))
 SingleHouse = c('% of Single House Units', mean(data$PCTSINGLES), sd(data$PCTSINGLES))
 
@@ -77,72 +80,67 @@ table = as.data.frame(t(data.frame(
               HH_poverty,
               bachelor,
               vacant,
-              SingleHouse
-              )))
+              SingleHouse))) 
 
+# TODO: rounding the digits
 colnames(table) = c("Variable", "Mean", "SD")
+table$Mean = as.numeric(table$Mean)
+table$SD = as.numeric(table$SD)
+table = table %>% mutate(across(where(is.numeric), round, digits=2))
 
-table
-```
-
-```{r}
-MedHV = ggplot(data) +
-        geom_histogram(aes(MEDHVAL))
-HHpov = ggplot(data) +
-        geom_histogram(aes(NBELPOV100))
-bach = ggplot(data) +
-        geom_histogram(aes(PCTBACHMOR))
-vacant = ggplot(data) +
-        geom_histogram(aes(PCTVACANT))
-SingleH = ggplot(data) +
-        geom_histogram(aes(PCTSINGLES))
-
-MedHV
-HHpov
-bach
-vacant
-SingleH
+table %>%
+  kbl(caption = "Summary Statistics") %>%
+  kable_styling() %>%
+  kable_classic(html_font = "Cambria", position = "left", full_width = F)
 
 ```
 
-```{r}
-data$LNMEDHVAL <- log(data$MEDHVAL)
-data$LNPCBACHMORE <- log(1+data$PCTBACHMOR)
-data$LNNBELPOV100 <- log(data$NBELPOV100)
-data$LNPCTVACANT <- log(1+data$PCTVACANT)
-data$LNPCTSINGLES <- log(1+data$PCTSINGLES)
+#### 3.1.2 Distribution
+
+As observed from the histograms, all variables are not normally distributed by
+right skewed. By transforming the variables using `log([VAR])` (or
+`log(1+[VAR])` if the variable has any zero values), some distributions of the
+transformed variables look normal while some have a large spike at zero. Based
+on the comparison, the subsequent analysis and the regression model will use
+
+-   the log-transformed variables `LNMEDHVAL` and `LNNBELPOV100`
+
+-   and the original variables `PCBACHMORE`, `PCTVACANT`, and `PCTSINGLES`.
+
+```{r fig.height = 9, fig.width = 9}
+original_vars <- c("MEDHVAL", "PCTBACHMOR", "NBELPOV100", "PCTVACANT", "PCTSINGLES")
+
+for (var in original_vars) {
+  log_var_name <- paste0("LN", var)
+  data[[log_var_name]] <- ifelse(data[[var]] == 0, log1p(data[[var]]), log(data[[var]]))
+}
+
+# Function to plot histogram
+plot_histogram <- function(data, var, title) {
+  ggplot(data, aes_string(x = var)) + 
+    geom_histogram(bins = 25, fill = "skyblue", color = "dark gray") +
+    theme_minimal() +
+    ggtitle(title) +
+    theme(plot.title = element_text(hjust = 0.5))
+}
+
+# Plotting histograms
+plot_list <- list()
+for (var in original_vars) {
+  plot_title <- table$Variable[which(original_vars  == var)]
+  original_plot <- plot_histogram(data, var, sprintf("Histogram of %s", plot_title))
+  log_plot <- plot_histogram(data, paste0("LN", var), sprintf("Histogram of LN %s", plot_title))
+  plot_list[[length(plot_list) + 1]] <- original_plot
+  plot_list[[length(plot_list) + 1]] <- log_plot
+}
+
+# Arrange the plots in a grid
+do.call("grid.arrange", c(plot_list, ncol=2))
 
 ```
 
-(from the instruction: c. Note that the dependent variable does look more or
-less normal after the transformation - LNMEDHVAL will be used as the dependent
-variable in the regression analysis. - for the predictors, the logarithmic
-transformation only helps normalize the NBELPOV100 variable - so we will use
-LNNBELPOV100 in the subsequent analyses
-
--   The other variables have a large spike at zero after the transformations
--   we will use the original, untransformed PCBACHMORE, PCTVACANT, and
-    PCTSINGLES variables in the regression
-
-```{r}
-LNMedHV = ggplot(data) +
-        geom_histogram(aes(LNMEDHVAL))
-LNHHpov = ggplot(data) +
-        geom_histogram(aes(LNNBELPOV100))
-LNbach = ggplot(data) +
-        geom_histogram(aes(LNPCBACHMORE))
-LNvacant = ggplot(data) +
-        geom_histogram(aes(LNPCTVACANT))
-LNSingleH = ggplot(data) +
-        geom_histogram(aes(LNPCTSINGLES))
-
-LNMedHV
-LNHHpov
-LNbach
-LNvacant
-LNSingleH
-
-```
+In addition to normality, the other regression assumptions will be examined in a
+separate section below (Regression Assumption Checks).
 
 b.  Look at whether the relationship between the dependent variable and each of
     the predictors is linear. present all four scatter plots as a single figure.
@@ -155,8 +153,6 @@ plot(data$LNMEDHVAL, data$LNNBELPOV100)
 plot(data$LNMEDHVAL, data$PCTBACHMOR)
 plot(data$LNMEDHVAL, data$PCTVACANT)
 plot(data$LNMEDHVAL, data$PCTSINGLES)
-
-
 ```
 
 ```{r}
@@ -196,6 +192,25 @@ ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
           ncol = 2, nrow = 2)
 ```
 
+#### 3.1.3 Choropleth Maps
+
+iii. Present the choropleth maps of the dependent variable and the predictors.
+iv. Refer to the maps in the text, and talk about the following:
+v.  Which maps look similar? Which maps look different? That is, which
+    predictors do you expect to be strongly associated with the dependent
+    variable based on the visualization? Also, given your examination of the
+    maps, are there any predictors that you think will be strongly
+    inter-correlated? That is, do you expect severe multicollinearity to be an
+    issue here? Discuss this in a paragraph.
+
+#### 3.1.4 Correlation Matrix
+
+iv. Present the correlation matrix of the predictors which you obtained from R.
+v.  Talk about whether the correlation matrix shows that there is severe
+    multicollinearity.
+vi. Does the correlation matrix support your conclusions based on your visual
+    comparison of predictor maps?
+
 ```{r}
 #data %>% 
  # filter_if(~is.numeric(.), all_vars(!is.infinite(.)))
@@ -213,5 +228,67 @@ library(corrplot)
 corrplot(res, type = "upper", 
          tl.col = "black", tl.srt = 45)
 ```
+
+### 3.2 Regression Results
+
+i.  Present the regression output from R. Be sure that your output presents the
+    parameter estimates (and associated standard errors, t-statistics and
+    p-values), as well as the R2, the adjusted R2, and the relevant F-ratio and
+    associated p-value.
+
+ii. Referencing the regression output in (i) above, interpret the results as in
+    the example included above this report outline.
+
+NOTE: YOUR DEPENDENT VARIABLE (AND SOME PREDICTORS) WOULD BE LOG-TRANSFORMED,
+UNLIKE IN THE EXAMPLE HERE. LOOK AT THE SLIDES FOR EXAMPLES OF INTERPRETING
+REGRESSION OUTPUT WITH LOG-TRANSFORMED VARIABLES.
+
+### 3.3 Regression Assumption Checks
+
+i.  First state that in this section, you will be talking about testing model
+    assumptions. State that you have already looked at the variable
+    distributions earlier.
+
+ii. Present scatter plots of the dependent variable and each of the predictors.
+    State whether each of the relationships seems to be linear, as assumed by
+    the regression model. [Hint: they will not look linear.]
+
+iii. Present the histogram of the standardized residuals. State whether the
+     residuals look normal.
+
+iv. Present the 'Standardized Residual by Predicted Value' scatter plot. What
+    conclusions can you draw from that? Does there seem to be
+    heteroscedasticity? Do there seem to be outliers? Anything else? Discuss.
+
+<!-- -->
+
+1.  Mention what standardized residuals are.
+
+<!-- -->
+
+v.  Referencing the maps of the dependent variable and the predictors that you
+    presented earlier, state whether there seems to be spatial autocorrelation
+    in your variables. That is, does it seem that the observations (i.e., block
+    groups) are independent of each other? Briefly discuss.
+
+<!-- -->
+
+vi. Now, present the choropleth map of the standardized regression residuals. Do
+    there seem to be any noticeable spatial patterns in them? That is, do they
+    seem to be spatially autocorrelated?
+
+<!-- -->
+
+1.  You will examine the spatial autocorrelation of the variables and residuals
+    and run spatial regressions in the next assignment.
+
+### 3.4 Additional Models
+
+i.  Present the results of the stepwise regression and state whether all 4
+    predictors in the original model are kept in the final model.
+
+ii. Present the cross-validation results -- that is, compare the RMSE of the
+    original model that includes all 4 predictors with the RMSE of the model
+    that only includes PCTVACANT and MEDHHINC as predictors.
 
 ## 4. Discussion and Limitations
