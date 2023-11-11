@@ -51,6 +51,7 @@ library(stargazer)
 library(cowplot)
 library(ggpubr)
 library(sf)
+library(corrr)
 ```
 
 ### 3.1 Exploratory Results
@@ -97,7 +98,7 @@ table %>%
 
 #### 3.1.2 Distribution
 
-As observed from the histograms, all variables are not normally distributed by
+As observed from the histograms, all variables are not normally distributed but
 right skewed. By transforming the variables using `log([VAR])` (or
 `log(1+[VAR])` if the variable has any zero values), some distributions of the
 transformed variables look normal while some have a large spike at zero. Based
@@ -142,91 +143,65 @@ do.call("grid.arrange", c(plot_list, ncol=2))
 In addition to normality, the other regression assumptions will be examined in a
 separate section below (Regression Assumption Checks).
 
-b.  Look at whether the relationship between the dependent variable and each of
-    the predictors is linear. present all four scatter plots as a single figure.
-
-```{r}
-# create a new plotting window and set the plotting area into a 2*2 array
-par(mfrow = c(2, 2))
-
-plot(data$LNMEDHVAL, data$LNNBELPOV100)
-plot(data$LNMEDHVAL, data$PCTBACHMOR)
-plot(data$LNMEDHVAL, data$PCTVACANT)
-plot(data$LNMEDHVAL, data$PCTSINGLES)
-```
-
-```{r}
-
-cor(data$LNMEDHVAL, data$LNNBELPOV100, method = c("pearson"), use = "complete.obs")
-cor(data$LNMEDHVAL, data$PCTBACHMOR, method = c("pearson"), use = "complete.obs")
-cor(data$LNMEDHVAL, data$PCTVACANT, method = c("pearson"), use = "complete.obs")
-cor(data$LNMEDHVAL, data$PCTSINGLES, method = c("pearson"), use = "complete.obs")
-
-```
-
-```{r}
-
-A <- ggscatter(data, x = "LNMEDHVAL", y = "LNNBELPOV100", 
-          add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "LNMEDHVAL", ylab = "LNNBELPOV100")
-
-B <- ggscatter(data, x = "LNMEDHVAL", y = "PCTBACHMOR", 
-          add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "LNMEDHVAL", ylab = "PCTBACHMOR")
-
-
-C <- ggscatter(data, x = "LNMEDHVAL", y = "PCTVACANT", 
-          add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "LNMEDHVAL", ylab = "PCTVACANT")
-
-D <- ggscatter(data, x = "LNMEDHVAL", y = "PCTSINGLES", 
-          add = "reg.line", conf.int = TRUE, 
-          cor.coef = TRUE, cor.method = "pearson",
-          xlab = "LNMEDHVAL", ylab = "PCTSINGLES")
-
-ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
-          labels = c("A", "B", "C", "D"),
-          ncol = 2, nrow = 2)
-```
-
 #### 3.1.3 Choropleth Maps
 
-iii. Present the choropleth maps of the dependent variable and the predictors.
-iv. Refer to the maps in the text, and talk about the following:
-v.  Which maps look similar? Which maps look different? That is, which
-    predictors do you expect to be strongly associated with the dependent
-    variable based on the visualization? Also, given your examination of the
-    maps, are there any predictors that you think will be strongly
-    inter-correlated? That is, do you expect severe multicollinearity to be an
-    issue here? Discuss this in a paragraph.
+```{r results='hide'}
+sfdata <- st_read('RegressionData.shp/RegressionData.shp')
+```
+
+```{r}
+ggplot(sfdata) +
+  geom_sf(aes(fill = LNMEDHVAL), color = NA) +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank(), # Remove background grid
+      axis.text = element_blank(), axis.ticks = element_blank(), # Remove axis text and ticks
+      axis.title = element_blank()) + # Remove axis titles
+  labs(title = "Choropleth Map for Dependent Variable", fill = "LNMEDHVAL")
+```
+
+```{r}
+vars_to_plot <- c("PCTBACHMOR", "LNNBELPOV", "PCTVACANT", "PCTSINGLES")
+
+# Create a combined plot
+plot_list <- list()
+for (var in vars_to_plot) {
+  p <- ggplot(sfdata) +
+    geom_sf(aes(fill = !!sym(var)), color = NA) + # Use 'sym' from rlang to convert string to symbol
+    scale_fill_viridis_c(option = "D") +
+    theme_void()
+  plot_list[[var]] <- p
+}
+
+grid.arrange(grobs = plot_list, ncol = 2, top = "Choropleth Maps for Independent Variables")
+```
+
+The choropleth maps show varying degrees of similarity and differences. Maps
+that are visually similar, such as `PCTBACHMOR` and `LNMEDHVAL`, may indicate a
+strong association between higher education levels and property values. In
+contrast, dissimilar patterns, like those potentially seen between `LNNBELPOV`
+and `LNMEDHVAL`, could suggest an inverse relationship, with higher home values
+corresponding to poverty level. The presence of strong visual correlations among
+independent variables hints at the possibility of multicollinearity, such as
+`PCTBACHMOR` and `LNNBELPOV`. This could complicate the analysis by obscuring
+the individual impacts of each predictor. Statistical analysis would be
+necessary to confirm these visual assessments.
 
 #### 3.1.4 Correlation Matrix
 
-iv. Present the correlation matrix of the predictors which you obtained from R.
-v.  Talk about whether the correlation matrix shows that there is severe
-    multicollinearity.
-vi. Does the correlation matrix support your conclusions based on your visual
-    comparison of predictor maps?
+We can further test multicollinearity with correlation matrix of independent
+variables., as shown below. The matrix suggests a weak correlation across
+predictors as all correlation coefficients fall within +-0.3. Hence, the matrix
+shows that there is no severe multicollinearity, which negates the previous
+visual observation from the maps.
 
 ```{r}
-#data %>% 
- # filter_if(~is.numeric(.), all_vars(!is.infinite(.)))
-data <- data %>% 
-  filter_all(all_vars(!is.infinite(.)))
-
-cormatrix <- data[, c(4,6,7,11)]
-res <- cor(cormatrix)
-round(res, 2)
-```
-
-```{r}
-
-library(corrplot)
-corrplot(res, type = "upper", 
-         tl.col = "black", tl.srt = 45)
+data[c("PCTBACHMOR", "LNNBELPOV100", "PCTVACANT", "PCTSINGLES")] %>% 
+  correlate() %>% 
+  autoplot() +
+  geom_text(aes(label = round(r, digits=2)), size = 3) +
+  labs(title = "Correlation Matrix")
 ```
 
 ### 3.2 Regression Results
@@ -245,18 +220,41 @@ REGRESSION OUTPUT WITH LOG-TRANSFORMED VARIABLES.
 
 ### 3.3 Regression Assumption Checks
 
-i.  First state that in this section, you will be talking about testing model
-    assumptions. State that you have already looked at the variable
-    distributions earlier.
+In this section, we will be talking about testing model assumptions: . Variables
+distribution is already discussed in previous section.
 
-ii. Present scatter plots of the dependent variable and each of the predictors.
-    State whether each of the relationships seems to be linear, as assumed by
-    the regression model. [Hint: they will not look linear.]
+The scatter plots between the log-transformed median house value and each of the
+independent variables exhibit distinct patterns. The plot with the
+log-transformed poverty count hints at a negative correlation, where more
+poverty may correspond to lower house values. A positive correlation appears
+between house value and educational attainment, suggesting that areas with a
+higher proportion of residents with at least a bachelor\'s degree may have
+higher property values. Vacancy rates and the proportion of single-family homes
+do not show a clear linear trend.
 
-iii. Present the histogram of the standardized residuals. State whether the
-     residuals look normal.
+```{r}
+data_long <- reshape2::melt(data, id.vars = 'LNMEDHVAL', 
+                            measure.vars = c('LNNBELPOV100', 'PCTBACHMOR', 'PCTVACANT', 'PCTSINGLES'))
 
-iv. Present the 'Standardized Residual by Predicted Value' scatter plot. What
+# Plot using ggplot2 with facet_wrap to create individual plots for each variable
+ggplot(data_long, aes(x = value, y = LNMEDHVAL)) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~variable, scales = 'free_x') +
+  theme_minimal() +
+  labs(y = 'Median House Value', x = 'Independent Variable')
+```
+
+```{r}
+cor(data$LNMEDHVAL, data$LNNBELPOV100, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTBACHMOR, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTVACANT, method = c("pearson"), use = "complete.obs")
+cor(data$LNMEDHVAL, data$PCTSINGLES, method = c("pearson"), use = "complete.obs")
+```
+
+i.  Present the histogram of the standardized residuals. State whether the
+    residuals look normal.
+
+ii. Present the 'Standardized Residual by Predicted Value' scatter plot. What
     conclusions can you draw from that? Does there seem to be
     heteroscedasticity? Do there seem to be outliers? Anything else? Discuss.
 
@@ -281,6 +279,34 @@ vi. Now, present the choropleth map of the standardized regression residuals. Do
 
 1.  You will examine the spatial autocorrelation of the variables and residuals
     and run spatial regressions in the next assignment.
+
+    ```{r}
+
+    A <- ggscatter(data, x = "LNMEDHVAL", y = "LNNBELPOV100", 
+              add = "reg.line", conf.int = TRUE, 
+              cor.coef = TRUE, cor.method = "pearson",
+              xlab = "LNMEDHVAL", ylab = "LNNBELPOV100")
+
+    B <- ggscatter(data, x = "LNMEDHVAL", y = "PCTBACHMOR", 
+              add = "reg.line", conf.int = TRUE, 
+              cor.coef = TRUE, cor.method = "pearson",
+              xlab = "LNMEDHVAL", ylab = "PCTBACHMOR")
+
+
+    C <- ggscatter(data, x = "LNMEDHVAL", y = "PCTVACANT", 
+              add = "reg.line", conf.int = TRUE, 
+              cor.coef = TRUE, cor.method = "pearson",
+              xlab = "LNMEDHVAL", ylab = "PCTVACANT")
+
+    D <- ggscatter(data, x = "LNMEDHVAL", y = "PCTSINGLES", 
+              add = "reg.line", conf.int = TRUE, 
+              cor.coef = TRUE, cor.method = "pearson",
+              xlab = "LNMEDHVAL", ylab = "PCTSINGLES")
+
+    ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
+              labels = c("A", "B", "C", "D"),
+              ncol = 2, nrow = 2)
+    ```
 
 ### 3.4 Additional Models
 
