@@ -52,6 +52,8 @@ library(cowplot)
 library(ggpubr)
 library(sf)
 library(corrr)
+library(car)  
+library(MASS)
 ```
 
 ### 3.1 Exploratory Results
@@ -196,7 +198,7 @@ predictors as all correlation coefficients fall within +-0.3. Hence, the matrix
 shows that there is no severe multicollinearity, which negates the previous
 visual observation from the maps.
 
-```{r}
+```{r, warning=FALSE}
 data[c("PCTBACHMOR", "LNNBELPOV100", "PCTVACANT", "PCTSINGLES")] %>% 
   correlate() %>% 
   autoplot() +
@@ -206,31 +208,67 @@ data[c("PCTBACHMOR", "LNNBELPOV100", "PCTVACANT", "PCTSINGLES")] %>%
 
 ### 3.2 Regression Results
 
-i.  Present the regression output from R. Be sure that your output presents the
-    parameter estimates (and associated standard errors, t-statistics and
-    p-values), as well as the R2, the adjusted R2, and the relevant F-ratio and
-    associated p-value.
+We regressed the log-transformed median value of housing units `LNMEDHVAL` on
+the proportion of residents with at least a bachelor's degree `PCTBACHMOR`, the
+log-transformed number of households living in poverty `LNNBELPOV100`, the
+proportion of vacant housing units `PCTVACANT`, and the percentage of single
+family houses `PCTSINGLES`. The regression output tells us that all independent
+variables are statistically significant in explaining the dependent variable
+with p\<0.01. The p-value tells us that if there is actually no relationship
+between the independent variable and the dependent variable (i.e., if the null
+hypothesis that β1=0 is actually true), then the probability of getting a
+coefficient estimate is less than 0.01. These low p-value indicate that we can
+safely reject H0: $β_{1}$ = 0 for Ha: $β_{1}$ ≠ 0, H0: $β_{2}$ = 0 for Ha:
+$β_{2}$ ≠ 0, H0: $β_{3}$ = 0 for Ha: $β_{3}$ ≠ 0, and H0: $β_{4}$ = 0 for Ha:
+$β_{4}$ ≠ 0, (at most reasonable levels of α = P(Type I error)). The percentage
+of single family houses and the proportion of residents with at least a
+bachelor's degree are positively associated with the dependent variable while
+the log-transformed number of households living in poverty and the proportion of
+vacant housing units are negatively associated with the dependent variable.
 
-ii. Referencing the regression output in (i) above, interpret the results as in
-    the example included above this report outline.
+As % with at least a bachelor's degree increases by 1%, the expected change in
+median house value is ($𝑒^{0.021}$ - 1)∗ 100% = 2.12%, holding other variables
+constant. As % living in poverty increases by 1%, the expected change in median
+house value is ($1.01^{-0.078}$ - 1)∗ 100% = -0.08%, holding other variables
+constant. As % of vacant units increases by 1%, the expected change in median
+house value is ($1.01^{-0.019}$ - 1)∗ 100% = -0.02%, holding other variables
+constant. As % of single housing units increases by 1%, the expected change in
+median house value is ($𝑒^{0.003}$ - 1)∗ 100% = 0.30%, holding other variables
+constant.
 
-NOTE: YOUR DEPENDENT VARIABLE (AND SOME PREDICTORS) WOULD BE LOG-TRANSFORMED,
-UNLIKE IN THE EXAMPLE HERE. LOOK AT THE SLIDES FOR EXAMPLES OF INTERPRETING
-REGRESSION OUTPUT WITH LOG-TRANSFORMED VARIABLES.
+More than two thirds of the variance in the dependent variable is explained by
+the model (R2 and Adjusted R2 are 0.662 and 0.661, respectively). The low
+p-value associated with the F-ratio shows that we can reject the null hypothesis
+that all coefficients in the model are 0.
+
+```{r warning=FALSE}
+lm = lm(LNMEDHVAL ~ PCTBACHMOR + LNNBELPOV100 + PCTVACANT + PCTSINGLES, data = data)
+
+stargazer(lm, type = "text", title = "Linear Regression", align = TRUE)
+```
+
+Here is the result of error sum of squares for the regression.
+
+```{r}
+anova(lm)
+```
 
 ### 3.3 Regression Assumption Checks
 
-In this section, we will be talking about testing model assumptions: . Variables
+In this section, we will be talking about testing model assumptions: linearity,
+residual normality, homoscedasticity, and spatial autocorrelation. Variables
 distribution is already discussed in previous section.
+
+#### 3.3.1 Linearity
 
 The scatter plots between the log-transformed median house value and each of the
 independent variables exhibit distinct patterns. The plot with the
 log-transformed poverty count hints at a negative correlation, where more
 poverty may correspond to lower house values. A positive correlation appears
 between house value and educational attainment, suggesting that areas with a
-higher proportion of residents with at least a bachelor\'s degree may have
-higher property values. Vacancy rates and the proportion of single-family homes
-do not show a clear linear trend.
+higher proportion of residents with at least a bachelor's degree may have higher
+property values. Vacancy rates and the proportion of single-family homes do not
+show a clear linear trend.
 
 ```{r}
 data_long <- reshape2::melt(data, id.vars = 'LNMEDHVAL', 
@@ -244,77 +282,74 @@ ggplot(data_long, aes(x = value, y = LNMEDHVAL)) +
   labs(y = 'Median House Value', x = 'Independent Variable')
 ```
 
-```{r}
+```{r include=FALSE}
 cor(data$LNMEDHVAL, data$LNNBELPOV100, method = c("pearson"), use = "complete.obs")
 cor(data$LNMEDHVAL, data$PCTBACHMOR, method = c("pearson"), use = "complete.obs")
 cor(data$LNMEDHVAL, data$PCTVACANT, method = c("pearson"), use = "complete.obs")
 cor(data$LNMEDHVAL, data$PCTSINGLES, method = c("pearson"), use = "complete.obs")
 ```
 
-i.  Present the histogram of the standardized residuals. State whether the
-    residuals look normal.
+#### 3.3.2 Residual Normality
 
-ii. Present the 'Standardized Residual by Predicted Value' scatter plot. What
-    conclusions can you draw from that? Does there seem to be
-    heteroscedasticity? Do there seem to be outliers? Anything else? Discuss.
+To test the second assumption, we will plot the distribution of standardized
+residuals, which is the raw residual divided by an estimate of the standard
+deviation of the residuals. The histogram of standardized residuals looks
+normally distributed.
 
-<!-- -->
+```{r}
+data$predvals <- fitted(lm) 
+data$resids <- residuals(lm)
+data$stdres <- rstandard(lm)
 
-1.  Mention what standardized residuals are.
+ggplot(data) +
+  geom_histogram(aes(x = stdres)) +
+  theme_minimal() +
+  labs(x = 'Standardized Residuals', y = 'Count')
+```
 
-<!-- -->
+#### 3.3.3 Homoscedasticity
 
-v.  Referencing the maps of the dependent variable and the predictors that you
-    presented earlier, state whether there seems to be spatial autocorrelation
-    in your variables. That is, does it seem that the observations (i.e., block
-    groups) are independent of each other? Briefly discuss.
+According the the plot of standardized residual by predicted value scatter plot,
+the variance of residuals seem different at various predicted value, meaning
+heteroscedasticity.
 
-<!-- -->
+```{r}
+ggplot(data, aes(x = predvals, y = stdres)) +
+  geom_point(alpha = 0.5) +
+  theme_minimal() +
+  labs(y = 'Standardized Residual', x = 'Predicted Value')
+```
 
-vi. Now, present the choropleth map of the standardized regression residuals. Do
-    there seem to be any noticeable spatial patterns in them? That is, do they
-    seem to be spatially autocorrelated?
+#### 3.3.4 Spatial autocorrelation
 
-<!-- -->
+By the choropleth maps we have drawn earlier, block groups that are close
+together do have similar values, meaning the observations are not spatially
+independent of each other. The choropleth map of the standardized regression
+residuals also shows that there are spatial patterns in the standardized
+residuals, with areas especially high in standardized residuals, indicating
+spatial autocorrelation.
 
-1.  You will examine the spatial autocorrelation of the variables and residuals
-    and run spatial regressions in the next assignment.
-
-    ```{r}
-
-    A <- ggscatter(data, x = "LNMEDHVAL", y = "LNNBELPOV100", 
-              add = "reg.line", conf.int = TRUE, 
-              cor.coef = TRUE, cor.method = "pearson",
-              xlab = "LNMEDHVAL", ylab = "LNNBELPOV100")
-
-    B <- ggscatter(data, x = "LNMEDHVAL", y = "PCTBACHMOR", 
-              add = "reg.line", conf.int = TRUE, 
-              cor.coef = TRUE, cor.method = "pearson",
-              xlab = "LNMEDHVAL", ylab = "PCTBACHMOR")
-
-
-    C <- ggscatter(data, x = "LNMEDHVAL", y = "PCTVACANT", 
-              add = "reg.line", conf.int = TRUE, 
-              cor.coef = TRUE, cor.method = "pearson",
-              xlab = "LNMEDHVAL", ylab = "PCTVACANT")
-
-    D <- ggscatter(data, x = "LNMEDHVAL", y = "PCTSINGLES", 
-              add = "reg.line", conf.int = TRUE, 
-              cor.coef = TRUE, cor.method = "pearson",
-              xlab = "LNMEDHVAL", ylab = "PCTSINGLES")
-
-    ggarrange(A, B, C, D + rremove("x.text"),  heights = c(10, 10),
-              labels = c("A", "B", "C", "D"),
-              ncol = 2, nrow = 2)
-    ```
+```{r}
+sfdata$stdres <- rstandard(lm)
+ggplot(sfdata) +
+  geom_sf(aes(fill = stdres), color = NA) +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), 
+      panel.grid.minor = element_blank(), # Remove background grid
+      axis.text = element_blank(), axis.ticks = element_blank(), # Remove axis text and ticks
+      axis.title = element_blank()) + # Remove axis titles
+  labs(title = "Choropleth Map for Standardized Residuals", fill = "stdres")
+```
 
 ### 3.4 Additional Models
 
-i.  Present the results of the stepwise regression and state whether all 4
-    predictors in the original model are kept in the final model.
+Stepwise regression could automatically select variables for regression model.
+Based on the results, all four variables are kept in the final model.
 
-ii. Present the cross-validation results -- that is, compare the RMSE of the
-    original model that includes all 4 predictors with the RMSE of the model
-    that only includes PCTVACANT and MEDHHINC as predictors.
+```{r}
+step <- stepAIC(lm, direction="both")
+step$anova 
+```
 
 ## 4. Discussion and Limitations
