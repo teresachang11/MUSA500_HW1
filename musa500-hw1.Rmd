@@ -20,17 +20,391 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Introduction
 
+**a)** The majority of pertinent research indicates that the housing value is
+significantly influenced by factors associated with the property's location and
+the characteristics of its neighborhood. The goal of this project is to examine
+the relationship between median house values in Philadelphia and several
+neighborhood characteristics, including the percentage of individuals with
+Bachelor\'s degrees or higher, the percentage of vacant houses, the number of
+households living in poverty, and the percentage of single family housing units.
+
+**b)** To explain why these predictors we\'re using might be related with the
+housing values, we looked at some research papers.
+
+The percentage of vacant houses: Certain recent publications have explored the
+influence of deteriorated or unoccupied residential structures on property
+values. For Philadelphia specifically, Shlay and Whitman (2004) have \"examined
+the impact of vacant housing units on nearby home values in Philadelphia and
+found that properties located within 150 feet of an abandoned unit sold for over
+\$7,000 less than other properties.\"$^1$ Therefore, the percentage of vacant
+houses may have a correlation with the housing values in our project dataset.
+
+The percentage of individuals with Bachelor\'s degrees or higher: Generally, the
+percentage of individuals with Bachelor's degrees or higher in a neighborhood
+may influence housing values. This is often associated with a more educated
+workforce, higher income levels, and a perception of a desirable community.
+According to a recent study done by Chetty R, Hendren N, Katz LF (2016),
+households living in neighborhoods with more-educated residents experienced
+large and persistent increases in neighborhood safety, neighborhood
+satisfaction, and housing quality.$^2$
+
+The number of households living in poverty: Research conducted by the Urban
+Institute (2017) suggests a relationship between the number of households living
+in poverty and housing values. Neighborhoods with higher poverty rates may face
+challenges related to crime, school quality, and overall community well-being,
+leading to a decrease in housing values.$^3$
+
+The percentage of single family housing units: The impact of having a higher
+percentage of single-family housing units on housing values can differ.
+Sometimes, having more single-family homes can bring stability and boost
+homeownership, which is good for property values. However, in areas where
+there's an overwhelming concentration of single-family houses, it might limit
+diversity and access to community services, potentially affecting property
+values negatively.$^4$ Although the research paper suggests two-way
+relationships, we are interested in examining the case for Philadelphia
+specifically, in order to see whether the percentage of single family housing
+units has a correlation with the housing values in the local market.
+
 ## 2. Methods
 
 ### 2.1 Data Cleaning
 
+To ensure the level of precision, we are using Philadelphia data at the Census
+block group level. The original Philadelphia block group dataset has 1816
+observations. The data is cleaned in advance by removing the following block
+groups: 
+
+1) Block groups where population \< 40
+
+2) Block groups where there are no housing units
+
+3) Block groups where the median house value is lower than \$10,000
+
+4) One North Philadelphia block group which had a very high median house value
+(over \$800,000) and a very low median household income (less than \$8,000)
+
+The final dataset contains 1720 block groups.
+
 ### 2.2 Exploratory Data Analysis
+
+As the first step, we should have a basic understanding of our dataset. We will
+examine the summary statistics of the dependent variable and the predictors, and
+distributions of variables to examine whether the variables are normally
+distributed. Then, we will examine the correlations between the predictors.
+Correlation is a standardized measure of the strength of the relationship
+between variables. The formula for the sample correlation coefficient r is shown
+below. In the formula, $n$ represents the number of observations. $x_i$ and
+$y_i$ are individual data points for variables x and y, respectively. $\bar{x}$
+and $\bar{y}$ denote the mean of the x and y variables, respectively. The result
+ranges from -1 to 1, where -1 indicates a perfect negative linear relationship,
+all $x_i, y_i$ pairs lie on a straight line with negative slope. r = 1 indicates
+a perfect positive linear relationship, all $x_i$, $y_i$ pairs lie on a straight
+line with positive slope. r = 0 indicates a lack of a linear relationship
+between the variables.
+
+$$
+r = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2} \sqrt{\sum_{i=1}^{n}(y_i - \bar{y})^2}}
+$$
 
 ### 2.3 Multiple Regression Analysis
 
+#### 2.3.1 The method of regression
+
+Regression is a statistical method used to examine the relationship between a
+variable of interest (dependent variable) and one or more explanatory variables
+(predictors). It is used to find the strength of the relationship, the direction
+of the relationship (positive, negative, zero) and the goodness of model fit.
+Regression allows the user to calculate the amount by which your dependent
+variable changes when a predictor variable changes by one unit, while holding
+all other predictors constant. If an explanatory variable is a significant
+predictor of the dependent variable, it doesn\'t imply that the explanatory
+variable is a cause of the dependent variable. In essence, regression can
+identify and establish a mathematical equation that best fits the observed data,
+allowing predictions of the dependent variable based on the values of the
+independent variables.
+
+#### 2.3.2 Equation
+
+Our regression equation is:
+
+$$
+MEDHVAL=β0+β1PCBACHMORE+β2NBELPOV100+β3PCTVACANT+β4PCTSINGLES+ε
+$$
+
+In this equation, the actual observed value of `MEDHVAL` is a linear function of
+`PCTVACANT`, `PCTSINGLES`, `PCTBACHMOR`, and `LNNBELPOV100`. MEDHVAL represents
+the median value of all owner occupied housing units. `PCTBACHMOR` refers to the
+percentage of individuals with Bachelor\'s degrees or higher. `PCTVACANT` is the
+percentage of vacant houses. `LNNBELPOV100` means the number of households with
+incomes below 100% poverty level, and `PCTSINGLES` denotes the percentage of
+single family housing units. Every independent variable will be assigned its own
+slope coefficient `(β1, β2, β3, β4)`, representing the association of that
+specific predictor with the dependent variable while considering the influence
+of all other independent variables in the regression. β0 is the constant term
+that determines the point at which the regression line intersects the y-axis.
+
+The term ε denotes the residual or random error in the model. In the absence of
+ε, every observed pair would precisely align with the true regression line. The
+introduction of the random error term ε permits the data points to deviate
+either above the true regression line (when ε \> 0) or below the line (when ε \<
+0). Therefore, the points will be scattered about the true regression line.
+
+#### 2.3.3 Regression Assumptions
+
+-   linearity: The first regression assumption is linearity, which assumes that
+    the relationship between the independent variable(s) and the dependent
+    variable is always linear. A change in the independent variables is
+    associated with a constant change in the dependent variable. We\'ll use
+    scatter plots of the dependent variable and each of the predictors to check
+    this assumption. 
+
+-   Independence of observations: The independence of observations assumption in
+    regression means that the values of the dependent variable are unrelated. It
+    means that the dependent variable for one observation should not convey any
+    information about the dependent variable for another observation point.
+
+-   Normality of residuals: Normality of residuals is important for point
+    estimation, confidence intervals, and hypothesis tests only for small
+    samples due to the Central Limit Theorem. However, if there are 30+
+    observations, with 10 additional observations for every additional predictor
+    after the first one, normality of residuals can be less important.
+    Violations of normality of residuals might arise either because the
+    dependent and/or independent variables are themselves non-normal, and/or the
+    linearity assumption is violated. In such cases, a nonlinear transformation
+    of variables might cure both problems. In some cases, the problem with the
+    residual distribution is mainly due to one or two very large errors. If they
+    are merely errors or if they can be explained as unique events not likely to
+    be repeated, then we may have cause to remove them. In some cases, however,
+    it may be that the extreme values in the data provide the most useful
+    information about values of some of the coefficients and/or provide the most
+    realistic guide to the magnitudes of forecast errors. We\'ll make a
+    histogram of the standardized residuals to see whether the residuals are
+    normal.
+
+-   Homoscedasticity: Homoscedasticity refers to the assumption that the
+    variability of the residuals, which are the differences between observed and
+    predicted values, is constant across all levels of the independent
+    variables. We\'ll use the Standardized Residual by Predicted Value scatter
+    plot to check homoscedasticity.
+
+-   No multicollinearity: The final assumption is non-multicollinearity. In
+    other words, the predictors should not be very strongly correlated with each
+    other. Multicollinearity is when two or more predictors are very strongly
+    correlated with each other. In other words, it means little or no value will
+    be added when we include a new predictor that\'s very similar to a predictor
+    that is already in the model. If multicollinearity is present, we may get
+    unstable regression parameters. Here is a way to test multicollinearity:
+    we\'ll use k as the number of predictors (in our case, k equals to 4). Since
+    k\>2, it is possible that the pairwise correlations are small, and yet a
+    linear dependence exists among three or even more variables. We can assess
+    for multicollinearity by regressing each predictor k on all the remaining
+    predictors. By looking at the R2 in each of the k regressions, if any of
+    these regressions yield R2 greater than 0.8, there is likely a problem with
+    multicollinearity. Using the R2 values from above, calculate the VIF for
+    each predictor k in the original regression. The VIF for each predictor k is
+    defined as follows: $VIF_k = \frac{1}{1 - R_k^2}$. A VIF of 1 means that
+    there is no correlation among the kth predictor and the remaining predictor
+    variables. VIFs exceeding 4 warrant further investigation, while VIFs
+    exceeding 10 are signs of serious multicollinearity requiring correction.\
+
+#### 2.3.4 Parameters Needed to be Estimated
+
+Every independent variable will be assigned its own slope coefficient (β1, β2,
+β3, β4), representing the association of that specific predictor with the
+dependent variable while considering the influence of all other independent
+variables in the regression. β0 is the constant term that determines the point
+at which the regression line intersects the y-axis.
+
+Given n observations on y, and k predictors x1 ... xk (in our case, x1, x2, x3,
+x4), the estimates $\beta_0 + \beta_1 + \beta_2 + \ldots + \beta_k$ are chosen
+simultaneously to minimize the expression for the Error Sum of Squares (SSE),
+given by:
+
+$$
+SSE = \sum_{i=1}^{n} \varepsilon^2 = \sum_{i=1}^{n} (y - \hat{y})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - ... - \hat{\beta}_k x_{ki})^2
+$$
+
+In Multiple Regression, $\sigma^2 = \frac{SSE}{n - (k + 1)} = MSE$, where k is
+the number of predictors (in our case, k=4) and n is the number of observations.
+MSE stands for the mean squared error.
+
+#### 2.3.5 The Way of Estimating Parameters
+
+The way to calculate values for β1 and β0 involves minimizing the sum of squared
+vertical distances (i.e., residuals) between the points and the (estimated)
+regression line. This way of obtaining parameters is called the least squares
+principle. Given n observations on y, and k predictors x1 ... xk (in our case,
+x1, x2, x3, x4), the estimates $\beta_0 + \beta_1 + \beta_2 + \ldots + \beta_k$
+are chosen simultaneously to minimize the expression for the Error Sum of
+Squares (SSE), given by:
+
+$$
+SSE = \sum_{i=1}^{n} \varepsilon^2 = \sum_{i=1}^{n} (y - \hat{y})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - ... - \hat{\beta}_k x_{ki})^2
+$$
+
+In this equation, $\varepsilon_i$ represents the residual for the $i^{th}$
+observation, which is the difference between the actual observed value $y_i$ and
+the predicted value $\hat{y}_i$ from the regression model. $n$ is the number of
+observations in the dataset.
+$\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2, \ldots, \hat{\beta}_k$ are the
+estimated coefficients of the regression model. $x_{1i}, x_{2i}, \ldots, x_{ki}$
+are the independent variables for the number i observation.
+
+The SSE equation calculates the total of squared variances between the observed
+values and the predicted values for each data point. The goal in regression
+analysis is often to minimize SSE by choosing the appropriate values for the
+regression coefficients, because a small SSE  means that the model is good at
+explaining the variability of the dependent variable.
+
+#### 2.3.5 Coefficient of Multiple Determination $R^2$ and the Adjusted $R^2$
+
+While $R^2$ measures the proportion of the variance in the dependent variable
+that is explained by the independent variables, adjusted $R^2$ takes into
+account the number of predictors in the model.
+
+The relationship between SST, SSR, and SSE is fundamental to understanding the
+coefficient of Multiple Determination $R^2$ and the Adjusted $R^2$ in the
+regression model.
+
+A quantitative measure of the total amount of variation in observed y values is
+given by the total sum of squares (SST): The SST involves subtracting y̅, the
+mean value of y, from each yi, and then squaring each difference and summing all
+the differences.
+
+$$
+SST = \sum_{i=1}^{n} (y_i - \bar{y})^2
+$$
+
+$y_i$ represents the individual observed values of the dependent variable.
+$\bar{y}$ is the mean of the dependent variable, calculated as
+$\frac{1}{n} \sum_{i=1}^{n} y_i$. $n$ is the number of observations in the
+dataset. The SST0s the sum of squared deviations about the sample mean of the
+observed y values -- without regard to x.
+
+If SSE is the amount of variance in y unexplained by the regression model and
+SST is the total amount of variance in y, then SSE/SST is the proportion of
+total variance that is unexplained by the model.
+
+Then 1 -- SSE/SST = SSR/SST = $R^2$, called the coefficient of determination, is
+the proportion of observed variation in the dependent variable y that was
+explained by the model. Here, SSR is the regression sum of squares, and is
+calculated as SSR = SST -- SSE.
+
+The higher the value of $R^2$, the more successful is the simple linear
+regression model in explaining the variation in the dependent variable y. If \\(
+R\^2 \\) is small, then we will look for another model, which either includes
+alternative, additional, or transformed predictors.
+
+Because extra predictors will generally increase $R^2$, it is typically adjusted
+for the number of predictors. The formula for adjusted $R^2$ is given by:
+
+$$
+\bar{R}^2 = \frac{{(n - 1)R^2 - k}}{{n - (k + 1)}}
+$$
+
+where: $\bar{R}^2$ is the adjusted $R^2$ and $n$ is the number of observations,
+$R^2$ is the coefficient of determination, $k$ is the number of independent
+variables in the regression model.
+
+#### 2.3.5 Hypotheses Test
+
+Our null hypothesis is that each particular predictor (the percentage of
+individuals with Bachelor\'s degrees or higher, the percentage of vacant houses,
+the number of households living in poverty, or the percentage of single family
+housing units) is not a significant predictor of the dependent variable (median
+house values in Philadelphia). 
+
+Our alternative hypothesis would state that at least one of the predictors (the
+percentage of individuals with Bachelor\'s degrees or higher, the percentage of
+vacant houses, the number of households living in poverty, or the percentage of
+single family housing units) is a significant predictor of the dependent
+variable (median house values in Philadelphia).
+
+Before doing a hypothesis test for each individual predictor, we do a so-called
+model utility test, referred to as the F-ratio, or the F-test. We test the Null
+Hypothesis (H0) that all coefficients in the model are jointly zero vs.
+Alternative Hypothesis that at least 1 of the coefficients is not 0. If none of
+the independent variables is a significant predictor of the dependent variable,
+then we\'re using a wrong model. We should reject the Null Hypothesis (H0) when
+p\<0.05. If we cannot reject the Null Hypothesis (H0), the model is not helpful
+for predicting. 
+
+In addition to the omnibus model utility test (F-test), a hypothesis test
+(t-test) will be done for each predictor i. Most statisticians will only look at
+these t-tests for each individual predictor if the omnibus model utility test is
+significant. As in simple regression, the Null Hypothesis (H0) is always that
+the predictor i is not associated with the dependent variable (i.e., the
+coefficient of predictor i, βi=0). The Alternative Hypothesis (Ha) is that βi≠0.
+In particular, for each predictor i, the quantity , (β ̂i-βi)/s\_(β ̂i )  has a
+t distribution with ν = n -- (k+1) degrees of freedom. Here, βi=E(β ̂i ), and if
+the null hypothesis is true, it equals 0, n is the number of observations and k
+is the number of predictors. A 95% Confidence interval for β_i is calculated as
+β ̂i±t\_(0.025,ν )∙s\_(β ̂i ). In a regression with k predictors X1, X2, ... ,
+Xk, we do these tests for each predictor\'s corresponding coefficient β1, β2,
+... , βk. If the p-value is less than the chosen significance level, there is
+evidence to reject the null hypothesis, suggesting a significant difference
+between the group means.
+
 ### 2.4 Additional Analyses
 
+#### 2.4.1 Stepwise Regression
+
+Stepwise Regression is a simple data mining method which selects predictors
+based on some criteria. The criterion for variable inclusion or exclusion in
+stepwise regression is often based on statistical tests, such as the p-value
+below a certain threshold, and AIC (Akaike Information Criterion), a measure of
+relative quality of statistical models.
+
+There are a number of limitations with it: The final model is not guaranteed to
+be optimal in any specified sense. The procedure yields a single final model,
+although there are often several equally good models. Stepwise regression does
+not take into account a researcher's knowledge about the predictors. It may be
+necessary to force the procedure to include important predictors. Although the
+order in which variables are removed or added can provide valuable information
+about the quality of the predictors, we should be careful to not over-interpret
+this order. We should not jump to the conclusion that all the important
+predictor variables for predicting y have been identified, or that all the
+unimportant predictor variables have been eliminated. It is, of course, possible
+that we may have committed a Type I or Type II error. Many t-tests for testing
+βk = 0 are conducted in a stepwise regression procedure. The probability is
+therefore high that we included some unimportant predictors or excluded some
+important predictors.
+
+#### 2.4.2 K-Fold Cross-Validation
+
+K-fold cross-validation is a method to assess the performance and generalization
+ability of a predictive model. K-Fold Cross-Validation involves randomly
+dividing the set of observations into k groups or folds, of (approximately)
+equal size. The 1st fold is treated as a validation data set and the model is
+fitted on the remaining k - 1 folds (training data set). The MSE is computed for
+the validation fold. MSE is a Function of Bias and Variance This procedure is
+repeated k times; each time, a different fold is treated as the validation data
+set. This process results in k estimates of the MSE. The k-fold MSE estimate is
+computed by averaging the MSEs across the k folds. The k-fold RMSE is computed
+as the square root of that MSE. In our project, k is set to 5. We can compare
+the RMSE values for different models and choose the model with the smallest RMSE
+as the best one.
+
+To explain what RMSE is in detail, we should start from SSE and MSE talked about
+in the previous section. If we divide SSE by the number of observations, n, then
+we get the mean squared error (MSE). The formula for Mean Squared Error (MSE) is
+given by:
+
+$$
+MSE = \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{n}
+$$
+
+$n$ is the number of observations, $y_i$ is the observed value, and $\hat{y}_i$
+is the predicted value.
+
+If we take the square root of the MSE, we get a statistic known as the root mean
+squared error (RMSE), which is an estimate of the magnitude of a typical
+residual. RMSE is a commonly used metric to evaluate the accuracy of a
+predictive model. The model that has the smaller RMSE is the better model.
+
 ### 2.5 Software
+
+We're using R for the data analysis and visualization for this project.
 
 ## 3. Results
 
@@ -352,4 +726,90 @@ step <- stepAIC(lm, direction="both")
 step$anova 
 ```
 
+Now, we use cross validation and compare the original model that includes all 4
+predictors with the RMSE of the model that only includes `PCTVACANT` and
+`MEDHHINC` as predictors. The RMSE of the original model is lower and the $R^2$
+is also higher, indicating better performance.
+
+```{r warning=FALSE}
+set.seed(23)
+fitControl <- trainControl(method = "cv", number = 5)
+lm.cv <- train(LNMEDHVAL ~ PCTBACHMOR + LNNBELPOV100 + PCTVACANT + PCTSINGLES, data = data, 
+               method = "lm", trControl = fitControl, na.action = na.pass)
+lm.cv
+```
+
+```{r warning=FALSE}
+set.seed(23)
+fitControl <- trainControl(method = "cv", number = 5)
+lm2.cv <- train(LNMEDHVAL ~ MEDHHINC + PCTVACANT, data = data, 
+               method = "lm", trControl = fitControl, na.action = na.pass)
+lm2.cv
+```
+
 ## 4. Discussion and Limitations
+
+In this paper, we explored the relationship between median house values in
+Philadelphia and various neighborhood characteristics. Our findings from the
+regression analysis indicate that all the selected predictors---percentage of
+individuals with Bachelor\'s degrees or higher, percentage of vacant houses,
+number of households living in poverty, and percentage of single-family housing
+units---have significant associations with the median house values.
+
+Our model demonstrated a good fit, as evidenced by a high R-squared value,
+indicating that over two-thirds of the variability in median house values could
+be explained by our predictors. The F-ratio test's low p-value further
+corroborates the overall significance of the model. The stepwise regression
+results retained all four predictors, suggesting that each contributes
+explanatory power to the model. When comparing the cross-validation results, the
+model with all four predictors performed better in terms of RMSE than the model
+with only two predictors. This result supports the robustness of our more
+complex model.
+
+Regarding the model's limitations, certain assumptions of regression were not
+fully met. For instance, the assumption of homoscedasticity was violated,
+indicating heteroscedasticity in the data. This could potentially affect the
+reliability of our parameter estimates. Additionally, we observed spatial
+autocorrelation in the residuals, which implies that our assumption of
+independence may not hold true across all observations. The use of the raw
+number of households living in poverty (NBELPOV100) as a predictor, instead of a
+percentage, presents another limitation, as it does not account for the scale of
+the block groups. This could skew the results where larger block groups with
+more households are concerned.
+
+Considering the potential limitations of our current model, Ridge or LASSO
+regression could be suitable alternatives. Ridge regression adds a penalty
+equivalent to the square of the magnitude of coefficients, which can reduce
+overfitting and multicollinearity. LASSO regression, on the other hand, adds a
+penalty equivalent to the absolute value of the magnitude of coefficients, which
+can lead to some coefficients being exactly zero, hence performing variable
+selection. These methods are particularly useful when there is a risk of
+overfitting or when the predictors are highly correlated. However, these methods
+also introduce bias into the parameter estimates, which is the trade-off for
+reducing variance and avoiding overfitting. In our case, given the
+multicollinearity was not severe and the model showed good predictive power, the
+need for these methods is not immediate but could be explored in future
+research.
+
+Overall, our model shows promising results, but further research could explore
+alternative regression methods and additional predictors to potentially enhance
+the model\'s performance and address its current limitations.
+
+## Citations: 
+
+1 Shlay, Anne & Whitman, Gordon. (2006). Research for Democracy: Linking
+Community Organizing and Research to Leverage Blight Policy. City & Community.
+5. 153 - 171. 10.1111/j.1540-6040.2006.00167.
+
+2 Chetty R, Hendren N, Katz LF. The Effects of Exposure to Better Neighborhoods
+on Children: New Evidence from the Moving to Opportunity Experiment. Am Econ
+Rev. 2016 Apr;106(4):855-902. doi: 10.1257/aer.20150572. PMID: 29546974.
+
+3 Urban blight and public health. (2017, April 11). Urban Institute.
+<https://www.urban.org/research/publication/urban-blight-and-public-health>
+
+4 Gyourko, Joseph, and Raven Molloy. "Regulation and the high cost of housing in
+California." Brookings Papers on Economic Activity. Economic Studies Program,
+The Brookings Institution, 2015.
+
+
