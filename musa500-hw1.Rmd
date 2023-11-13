@@ -112,16 +112,16 @@ $$
 
 Regression is a statistical method used to examine the relationship between a
 variable of interest (dependent variable) and one or more explanatory variables
-(predictors). It is used to find the strength of the relationship, the direction
-of the relationship (positive, negative, zero) and the goodness of model fit.
-Regression allows the user to calculate the amount by which your dependent
-variable changes when a predictor variable changes by one unit, while holding
-all other predictors constant. If an explanatory variable is a significant
-predictor of the dependent variable, it doesn\'t imply that the explanatory
-variable is a cause of the dependent variable. In essence, regression can
-identify and establish a mathematical equation that best fits the observed data,
-allowing predictions of the dependent variable based on the values of the
-independent variables.
+(predictors). It can be used to find the strength of the relationship, the
+direction of the relationship (positive, negative, zero) and the goodness of
+model fit. Regression allows the user to calculate the amount by which your
+dependent variable changes when a predictor variable changes by one unit, while
+holding all other predictors constant. If an explanatory variable is a
+significant predictor of the dependent variable, it doesn\'t imply that the
+explanatory variable is a cause of the dependent variable. In essence,
+regression can identify and establish a mathematical equation that best fits the
+observed data, allowing predictions and explanations of the dependent variable
+based on the independent variables.
 
 #### 2.3.2 Equation
 
@@ -132,26 +132,25 @@ MEDHVAL=β0+β1PCBACHMORE+β2NBELPOV100+β3PCTVACANT+β4PCTSINGLES+ε
 $$
 
 In this equation, the actual observed value of `MEDHVAL` is a linear function of
-`PCTVACANT`, `PCTSINGLES`, `PCTBACHMOR`, and `LNNBELPOV100`. MEDHVAL represents
-the median value of all owner occupied housing units. `PCTBACHMOR` refers to the
-percentage of individuals with Bachelor\'s degrees or higher. `PCTVACANT` is the
-percentage of vacant houses. `LNNBELPOV100` means the number of households with
-incomes below 100% poverty level, and `PCTSINGLES` denotes the percentage of
-single family housing units. Every independent variable will be assigned its own
-slope coefficient `(β1, β2, β3, β4)`, representing the association of that
-specific predictor with the dependent variable while considering the influence
-of all other independent variables in the regression. β0 is the constant term
-that determines the point at which the regression line intersects the y-axis.
-
-The term ε denotes the residual or random error in the model. In the absence of
-ε, every observed pair would precisely align with the true regression line. The
-introduction of the random error term ε permits the data points to deviate
-either above the true regression line (when ε \> 0) or below the line (when ε \<
-0). Therefore, the points will be scattered about the true regression line.
+`PCTVACANT`, `PCTSINGLES`, `PCTBACHMOR`, and `LNNBELPOV1` where `MEDHVAL`
+represents the median value of all owner occupied housing units, `PCTBACHMOR`
+refers to the percentage of individuals with Bachelor\'s degrees or higher,
+`PCTVACANT` is the percentage of vacant houses, `LNNBELPOV100` means the number
+of households with incomes below 100% poverty level, and `PCTSINGLES` denotes
+the percentage of single family housing units. Every independent variable will
+be assigned its own slope coefficient `(β1, β2, β3, β4)`, representing the
+association of that specific predictor with the dependent variable. β0 is the
+constant term that determines the point at which the regression line intersects
+the y-axis. The term ε denotes the residual or random error in the model. errors
+are something that we cannot predict, and are considered to be random. In the
+absence of ε, every observed pair would precisely align with the true regression
+line. The introduction of the random error term ε permits the data points to
+deviate either above the true regression line (when ε \> 0) or below the line
+(when ε \< 0).
 
 #### 2.3.3 Regression Assumptions
 
--   linearity: The first regression assumption is linearity, which assumes that
+-   Linearity: The first regression assumption is linearity, which assumes that
     the relationship between the independent variable(s) and the dependent
     variable is always linear. A change in the independent variables is
     associated with a constant change in the dependent variable. We\'ll use
@@ -215,10 +214,10 @@ dependent variable while considering the influence of all other independent
 variables in the regression. β0 is the constant term that determines the point
 at which the regression line intersects the y-axis.
 
-Given n observations on y, and k predictors x1 ... xk (in our case, x1, x2, x3,
-x4), the estimates $\beta_0 + \beta_1 + \beta_2 + \ldots + \beta_k$ are chosen
-simultaneously to minimize the expression for the Error Sum of Squares (SSE),
-given by:
+Given n observations on y, and k predictors $x_0, x_1, x_2, \ldots, x_k$ (in our
+case, $x_1, x_2, x_3, x_4$), the estimates
+$\beta_0, \beta_1, \beta_2, \ldots, \beta_k$ are chosen to minimize the
+expression for the Error Sum of Squares (SSE), given by:
 
 $$
 SSE = \sum_{i=1}^{n} \varepsilon^2 = \sum_{i=1}^{n} (y - \hat{y})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - ... - \hat{\beta}_k x_{ki})^2
