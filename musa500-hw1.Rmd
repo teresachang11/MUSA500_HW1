@@ -6,7 +6,6 @@ output:
   html_document:
     toc: true
     toc_float: true
-    number_sections: true
     code_folding: hide
 editor_options: 
   markdown: 
@@ -18,7 +17,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1. Introduction
+## 1 Introduction
 
 **a)** The majority of pertinent research indicates that the housing value is
 significantly influenced by factors associated with the property's location and
@@ -65,7 +64,7 @@ relationships, we are interested in examining the case for Philadelphia
 specifically, in order to see whether the percentage of single family housing
 units has a correlation with the housing values in the local market.
 
-## 2. Methods
+## 2 Methods
 
 ### 2.1 Data Cleaning
 
@@ -223,24 +222,6 @@ $$
 SSE = \sum_{i=1}^{n} \varepsilon^2 = \sum_{i=1}^{n} (y - \hat{y})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - ... - \hat{\beta}_k x_{ki})^2
 $$
 
-In Multiple Regression, $\sigma^2 = \frac{SSE}{n - (k + 1)} = MSE$, where k is
-the number of predictors (in our case, k=4) and n is the number of observations.
-MSE stands for the mean squared error.
-
-#### 2.3.5 The Way of Estimating Parameters
-
-The way to calculate values for β1 and β0 involves minimizing the sum of squared
-vertical distances (i.e., residuals) between the points and the (estimated)
-regression line. This way of obtaining parameters is called the least squares
-principle. Given n observations on y, and k predictors x1 ... xk (in our case,
-x1, x2, x3, x4), the estimates $\beta_0 + \beta_1 + \beta_2 + \ldots + \beta_k$
-are chosen simultaneously to minimize the expression for the Error Sum of
-Squares (SSE), given by:
-
-$$
-SSE = \sum_{i=1}^{n} \varepsilon^2 = \sum_{i=1}^{n} (y - \hat{y})^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - ... - \hat{\beta}_k x_{ki})^2
-$$
-
 In this equation, $\varepsilon_i$ represents the residual for the $i^{th}$
 observation, which is the difference between the actual observed value $y_i$ and
 the predicted value $\hat{y}_i$ from the regression model. $n$ is the number of
@@ -249,26 +230,40 @@ $\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2, \ldots, \hat{\beta}_k$ are the
 estimated coefficients of the regression model. $x_{1i}, x_{2i}, \ldots, x_{ki}$
 are the independent variables for the number i observation.
 
-The SSE equation calculates the total of squared variances between the observed
-values and the predicted values for each data point. The goal in regression
-analysis is often to minimize SSE by choosing the appropriate values for the
-regression coefficients, because a small SSE  means that the model is good at
-explaining the variability of the dependent variable.
+In Multiple Regression, the variance of the residuals is calculated as
+$\sigma^2 = \frac{SSE}{n - (k + 1)}$, where k is the number of predictors (in
+our case, k=4) and n is the number of observations.
+
+#### 2.3.5 The Way of Estimating Parameters
+
+The way to calculate values for β1 and β0 involves minimizing the sum of squared
+vertical distances (i.e., residuals) between the points and the (estimated)
+regression line. This way of obtaining parameters is called the least squares
+principle. The goal in regression analysis is often to minimize SSE (SSE
+calculates the total of squared variances between the observed values and the
+predicted values for each data point as previously shown) by choosing the
+appropriate values for the regression coefficients, because a small SSE means
+that the model is good at explaining the variability of the dependent variable.
+The formulas for the slope coefficient and the intercept are:
+
+$$
+\beta_1 = \frac{\sum_{i=1}^{n} (x_i - \overline{x})(y_i - \overline{y})}{\sum_{i=1}^{n} (x_i - \overline{x})^2}
+$$
+
+$$
+\beta_0 = \overline{y} - \beta_1\overline{x}
+$$
 
 #### 2.3.5 Coefficient of Multiple Determination $R^2$ and the Adjusted $R^2$
 
 While $R^2$ measures the proportion of the variance in the dependent variable
 that is explained by the independent variables, adjusted $R^2$ takes into
-account the number of predictors in the model.
-
-The relationship between SST, SSR, and SSE is fundamental to understanding the
-coefficient of Multiple Determination $R^2$ and the Adjusted $R^2$ in the
-regression model.
+account the number of predictors in the model. The relationship between SST,
+SSR, and SSE is fundamental to understanding the coefficient of Multiple
+Determination $R^2$ and the Adjusted $R^2$ in the regression model.
 
 A quantitative measure of the total amount of variation in observed y values is
-given by the total sum of squares (SST): The SST involves subtracting y̅, the
-mean value of y, from each yi, and then squaring each difference and summing all
-the differences.
+given by the total sum of squares (SST):
 
 $$
 SST = \sum_{i=1}^{n} (y_i - \bar{y})^2
@@ -280,22 +275,19 @@ $\frac{1}{n} \sum_{i=1}^{n} y_i$. $n$ is the number of observations in the
 dataset. The SST0s the sum of squared deviations about the sample mean of the
 observed y values -- without regard to x.
 
-If SSE is the amount of variance in y unexplained by the regression model and
-SST is the total amount of variance in y, then SSE/SST is the proportion of
-total variance that is unexplained by the model.
-
-Then 1 -- SSE/SST = SSR/SST = $R^2$, called the coefficient of determination, is
-the proportion of observed variation in the dependent variable y that was
-explained by the model. Here, SSR is the regression sum of squares, and is
-calculated as SSR = SST -- SSE.
+SSE is the amount of variance in y unexplained by the regression model and SST
+is the total amount of variance in y, then SSE/SST is the proportion of total
+variance that is unexplained by the model. Then $1-SSE/SST = SSR/SST = R^2$,
+called the coefficient of determination, is the proportion of observed variation
+in the dependent variable y that was explained by the model. Here, SSR is the
+regression sum of squares, and is calculated as SSR = SST -- SSE.
 
 The higher the value of $R^2$, the more successful is the simple linear
-regression model in explaining the variation in the dependent variable y. If \\(
-R\^2 \\) is small, then we will look for another model, which either includes
-alternative, additional, or transformed predictors.
-
-Because extra predictors will generally increase $R^2$, it is typically adjusted
-for the number of predictors. The formula for adjusted $R^2$ is given by:
+regression model in explaining the variation in the dependent variable y. If
+$R^2$ is small, then we will look for another model, which either includes
+alternative, additional, or transformed predictors. Because extra predictors
+will generally increase $R^2$, it is typically adjusted for the number of
+predictors. The formula for adjusted $R^2$ is given by:
 
 $$
 \bar{R}^2 = \frac{{(n - 1)R^2 - k}}{{n - (k + 1)}}
@@ -311,38 +303,30 @@ Our null hypothesis is that each particular predictor (the percentage of
 individuals with Bachelor\'s degrees or higher, the percentage of vacant houses,
 the number of households living in poverty, or the percentage of single family
 housing units) is not a significant predictor of the dependent variable (median
-house values in Philadelphia). 
-
-Our alternative hypothesis would state that at least one of the predictors (the
-percentage of individuals with Bachelor\'s degrees or higher, the percentage of
-vacant houses, the number of households living in poverty, or the percentage of
-single family housing units) is a significant predictor of the dependent
-variable (median house values in Philadelphia).
+house values in Philadelphia).  Our alternative hypothesis would state that at
+least one of the predictors is a significant predictor of the dependent
+variable.
 
 Before doing a hypothesis test for each individual predictor, we do a so-called
-model utility test, referred to as the F-ratio, or the F-test. We test the Null
-Hypothesis (H0) that all coefficients in the model are jointly zero vs.
-Alternative Hypothesis that at least 1 of the coefficients is not 0. If none of
-the independent variables is a significant predictor of the dependent variable,
-then we\'re using a wrong model. We should reject the Null Hypothesis (H0) when
-p\<0.05. If we cannot reject the Null Hypothesis (H0), the model is not helpful
-for predicting. 
+model utility test, referred to as the F-test. We test the Null Hypothesis (H0)
+that all coefficients in the model are jointly zero vs. Alternative Hypothesis
+that at least 1 of the coefficients is not 0. If none of the independent
+variables is a significant predictor of the dependent variable, we should reject
+the Null Hypothesis (H0) when p value is relatively small, say p\<0.05. If we
+cannot reject the Null Hypothesis (H0), the model is not helpful for
+predicting. 
 
-In addition to the omnibus model utility test (F-test), a hypothesis test
-(t-test) will be done for each predictor i. Most statisticians will only look at
-these t-tests for each individual predictor if the omnibus model utility test is
-significant. As in simple regression, the Null Hypothesis (H0) is always that
-the predictor i is not associated with the dependent variable (i.e., the
-coefficient of predictor i, βi=0). The Alternative Hypothesis (Ha) is that βi≠0.
-In particular, for each predictor i, the quantity , (β ̂i-βi)/s\_(β ̂i )  has a
-t distribution with ν = n -- (k+1) degrees of freedom. Here, βi=E(β ̂i ), and if
-the null hypothesis is true, it equals 0, n is the number of observations and k
-is the number of predictors. A 95% Confidence interval for β_i is calculated as
-β ̂i±t\_(0.025,ν )∙s\_(β ̂i ). In a regression with k predictors X1, X2, ... ,
-Xk, we do these tests for each predictor\'s corresponding coefficient β1, β2,
-... , βk. If the p-value is less than the chosen significance level, there is
-evidence to reject the null hypothesis, suggesting a significant difference
-between the group means.
+In addition to the F-test, a hypothesis test (t-test) will be done for each
+predictor i. Most statisticians will only look at these t-tests for each
+individual predictor if the omnibus model utility test is significant. As in
+simple regression, the Null Hypothesis (H0) is that the predictor i is not
+associated with the dependent variable (i.e., the coefficient of predictor i,
+βi=0). The Alternative Hypothesis (Ha) is that βi≠0. In a regression with k
+predictors $x_0, x_1, x_2, \ldots, x_k$, we do these tests for each predictor\'s
+corresponding coefficient $\beta_0, \beta_1, \beta_2, \ldots, \beta_k$. If the
+p-value is less than the chosen significance level, there is evidence to reject
+the null hypothesis, suggesting a significant difference between the group
+means.
 
 ### 2.4 Additional Analyses
 
@@ -384,10 +368,8 @@ as the square root of that MSE. In our project, k is set to 5. We can compare
 the RMSE values for different models and choose the model with the smallest RMSE
 as the best one.
 
-To explain what RMSE is in detail, we should start from SSE and MSE talked about
-in the previous section. If we divide SSE by the number of observations, n, then
-we get the mean squared error (MSE). The formula for Mean Squared Error (MSE) is
-given by:
+To explain what RMSE is in detail, we should start from SSE and MSE. The formula
+for Mean Squared Error (MSE) is given by:
 
 $$
 MSE = \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{n}
@@ -405,7 +387,7 @@ predictive model. The model that has the smaller RMSE is the better model.
 
 We're using R for the data analysis and visualization for this project.
 
-## 3. Results
+## 3 Results
 
 ```{r load_packages, warning = FALSE, include=FALSE}
 options(scipen=10000000)
@@ -746,7 +728,7 @@ lm2.cv <- train(LNMEDHVAL ~ MEDHHINC + PCTVACANT, data = data,
 lm2.cv
 ```
 
-## 4. Discussion and Limitations
+## 4 Discussion and Limitations
 
 In this paper, we explored the relationship between median house values in
 Philadelphia and various neighborhood characteristics. Our findings from the
