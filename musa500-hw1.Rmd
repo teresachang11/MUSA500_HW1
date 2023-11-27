@@ -24,21 +24,21 @@ significantly influenced by factors associated with the property's location and
 the characteristics of its neighborhood. The goal of this project is to examine
 the relationship between median house values in Philadelphia and several
 neighborhood characteristics, including the percentage of individuals with
-Bachelor\'s degrees or higher, the percentage of vacant houses, the number of
+Bachelor's degrees or higher, the percentage of vacant houses, the number of
 households living in poverty, and the percentage of single family housing units.
 
-**b)** To explain why these predictors we\'re using might be related with the
+**b)** To explain why these predictors we're using might be related with the
 housing values, we looked at some research papers.
 
 The percentage of vacant houses: Certain recent publications have explored the
 influence of deteriorated or unoccupied residential structures on property
-values. For Philadelphia specifically, Shlay and Whitman (2004) have \"examined
+values. For Philadelphia specifically, Shlay and Whitman (2004) have "examined
 the impact of vacant housing units on nearby home values in Philadelphia and
 found that properties located within 150 feet of an abandoned unit sold for over
-\$7,000 less than other properties.\"$^1$ Therefore, the percentage of vacant
+\$7,000 less than other properties."$^1$ Therefore, the percentage of vacant
 houses may have a correlation with the housing values in our project dataset.
 
-The percentage of individuals with Bachelor\'s degrees or higher: Generally, the
+The percentage of individuals with Bachelor's degrees or higher: Generally, the
 percentage of individuals with Bachelor's degrees or higher in a neighborhood
 may influence housing values. This is often associated with a more educated
 workforce, higher income levels, and a perception of a desirable community.
@@ -73,14 +73,14 @@ block group level. The original Philadelphia block group dataset has 1816
 observations. The data is cleaned in advance by removing the following block
 groups: 
 
-1) Block groups where population \< 40
+1)  Block groups where population \< 40
 
-2) Block groups where there are no housing units
+2)  Block groups where there are no housing units
 
-3) Block groups where the median house value is lower than \$10,000
+3)  Block groups where the median house value is lower than \$10,000
 
-4) One North Philadelphia block group which had a very high median house value
-(over \$800,000) and a very low median household income (less than \$8,000)
+4)  One North Philadelphia block group which had a very high median house value
+    (over \$800,000) and a very low median household income (less than \$8,000)
 
 The final dataset contains 1720 block groups.
 
@@ -116,7 +116,7 @@ direction of the relationship (positive, negative, zero) and the goodness of
 model fit. Regression allows the user to calculate the amount by which your
 dependent variable changes when a predictor variable changes by one unit, while
 holding all other predictors constant. If an explanatory variable is a
-significant predictor of the dependent variable, it doesn\'t imply that the
+significant predictor of the dependent variable, it doesn't imply that the
 explanatory variable is a cause of the dependent variable. In essence,
 regression can identify and establish a mathematical equation that best fits the
 observed data, allowing predictions and explanations of the dependent variable
@@ -133,7 +133,7 @@ $$
 In this equation, the actual observed value of `MEDHVAL` is a linear function of
 `PCTVACANT`, `PCTSINGLES`, `PCTBACHMOR`, and `LNNBELPOV1` where `MEDHVAL`
 represents the median value of all owner occupied housing units, `PCTBACHMOR`
-refers to the percentage of individuals with Bachelor\'s degrees or higher,
+refers to the percentage of individuals with Bachelor's degrees or higher,
 `PCTVACANT` is the percentage of vacant houses, `LNNBELPOV100` means the number
 of households with incomes below 100% poverty level, and `PCTSINGLES` denotes
 the percentage of single family housing units. Every independent variable will
@@ -152,7 +152,7 @@ deviate either above the true regression line (when ε \> 0) or below the line
 -   Linearity: The first regression assumption is linearity, which assumes that
     the relationship between the independent variable(s) and the dependent
     variable is always linear. A change in the independent variables is
-    associated with a constant change in the dependent variable. We\'ll use
+    associated with a constant change in the dependent variable. We'll use
     scatter plots of the dependent variable and each of the predictors to check
     this assumption. 
 
@@ -175,24 +175,23 @@ deviate either above the true regression line (when ε \> 0) or below the line
     be repeated, then we may have cause to remove them. In some cases, however,
     it may be that the extreme values in the data provide the most useful
     information about values of some of the coefficients and/or provide the most
-    realistic guide to the magnitudes of forecast errors. We\'ll make a
-    histogram of the standardized residuals to see whether the residuals are
-    normal.
+    realistic guide to the magnitudes of forecast errors. We'll make a histogram
+    of the standardized residuals to see whether the residuals are normal.
 
 -   Homoscedasticity: Homoscedasticity refers to the assumption that the
     variability of the residuals, which are the differences between observed and
     predicted values, is constant across all levels of the independent
-    variables. We\'ll use the Standardized Residual by Predicted Value scatter
+    variables. We'll use the Standardized Residual by Predicted Value scatter
     plot to check homoscedasticity.
 
 -   No multicollinearity: The final assumption is non-multicollinearity. In
     other words, the predictors should not be very strongly correlated with each
     other. Multicollinearity is when two or more predictors are very strongly
     correlated with each other. In other words, it means little or no value will
-    be added when we include a new predictor that\'s very similar to a predictor
+    be added when we include a new predictor that's very similar to a predictor
     that is already in the model. If multicollinearity is present, we may get
     unstable regression parameters. Here is a way to test multicollinearity:
-    we\'ll use k as the number of predictors (in our case, k equals to 4). Since
+    we'll use k as the number of predictors (in our case, k equals to 4). Since
     k\>2, it is possible that the pairwise correlations are small, and yet a
     linear dependence exists among three or even more variables. We can assess
     for multicollinearity by regressing each predictor k on all the remaining
@@ -300,7 +299,7 @@ variables in the regression model.
 #### 2.3.5 Hypotheses Test
 
 Our null hypothesis is that each particular predictor (the percentage of
-individuals with Bachelor\'s degrees or higher, the percentage of vacant houses,
+individuals with Bachelor's degrees or higher, the percentage of vacant houses,
 the number of households living in poverty, or the percentage of single family
 housing units) is not a significant predictor of the dependent variable (median
 house values in Philadelphia).  Our alternative hypothesis would state that at
@@ -322,7 +321,7 @@ individual predictor if the omnibus model utility test is significant. As in
 simple regression, the Null Hypothesis (H0) is that the predictor i is not
 associated with the dependent variable (i.e., the coefficient of predictor i,
 βi=0). The Alternative Hypothesis (Ha) is that βi≠0. In a regression with k
-predictors $x_0, x_1, x_2, \ldots, x_k$, we do these tests for each predictor\'s
+predictors $x_0, x_1, x_2, \ldots, x_k$, we do these tests for each predictor's
 corresponding coefficient $\beta_0, \beta_1, \beta_2, \ldots, \beta_k$. If the
 p-value is less than the chosen significance level, there is evidence to reject
 the null hypothesis, suggesting a significant difference between the group
@@ -733,7 +732,7 @@ lm2.cv
 In this paper, we explored the relationship between median house values in
 Philadelphia and various neighborhood characteristics. Our findings from the
 regression analysis indicate that all the selected predictors---percentage of
-individuals with Bachelor\'s degrees or higher, percentage of vacant houses,
+individuals with Bachelor's degrees or higher, percentage of vacant houses,
 number of households living in poverty, and percentage of single-family housing
 units---have significant associations with the median house values.
 
@@ -774,9 +773,9 @@ research.
 
 Overall, our model shows promising results, but further research could explore
 alternative regression methods and additional predictors to potentially enhance
-the model\'s performance and address its current limitations.
+the model's performance and address its current limitations.
 
-## Citations: 
+## Citations:
 
 1 Shlay, Anne & Whitman, Gordon. (2006). Research for Democracy: Linking
 Community Organizing and Research to Leverage Blight Policy. City & Community.
@@ -792,5 +791,3 @@ Rev. 2016 Apr;106(4):855-902. doi: 10.1257/aer.20150572. PMID: 29546974.
 4 Gyourko, Joseph, and Raven Molloy. "Regulation and the high cost of housing in
 California." Brookings Papers on Economic Activity. Economic Studies Program,
 The Brookings Institution, 2015.
-
-

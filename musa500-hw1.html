@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chenxi Zhu, Teresa Chang, and Tiffany Luo" />
 
-<meta name="date" content="2023-11-12" />
+<meta name="date" content="2023-11-16" />
 
 <title>MUSA500 - HW1</title>
 
@@ -1824,7 +1824,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">MUSA500 - HW1</h1>
 <h4 class="author">Chenxi Zhu, Teresa Chang, and Tiffany Luo</h4>
-<h4 class="date">2023-11-12</h4>
+<h4 class="date">2023-11-16</h4>
 
 </div>
 
@@ -1836,22 +1836,22 @@ the housing value is significantly influenced by factors associated with
 the property’s location and the characteristics of its neighborhood. The
 goal of this project is to examine the relationship between median house
 values in Philadelphia and several neighborhood characteristics,
-including the percentage of individuals with Bachelor&#39;s degrees or
+including the percentage of individuals with Bachelor’s degrees or
 higher, the percentage of vacant houses, the number of households living
 in poverty, and the percentage of single family housing units.</p>
-<p><strong>b)</strong> To explain why these predictors we&#39;re using might
+<p><strong>b)</strong> To explain why these predictors we’re using might
 be related with the housing values, we looked at some research
 papers.</p>
 <p>The percentage of vacant houses: Certain recent publications have
 explored the influence of deteriorated or unoccupied residential
 structures on property values. For Philadelphia specifically, Shlay and
-Whitman (2004) have &quot;examined the impact of vacant housing units on
+Whitman (2004) have “examined the impact of vacant housing units on
 nearby home values in Philadelphia and found that properties located
 within 150 feet of an abandoned unit sold for over $7,000 less than
-other properties.&quot;<span class="math inline">\(^1\)</span> Therefore, the
+other properties.”<span class="math inline">\(^1\)</span> Therefore, the
 percentage of vacant houses may have a correlation with the housing
 values in our project dataset.</p>
-<p>The percentage of individuals with Bachelor&#39;s degrees or higher:
+<p>The percentage of individuals with Bachelor’s degrees or higher:
 Generally, the percentage of individuals with Bachelor’s degrees or
 higher in a neighborhood may influence housing values. This is often
 associated with a more educated workforce, higher income levels, and a
@@ -1933,7 +1933,7 @@ negative, zero) and the goodness of model fit. Regression allows the
 user to calculate the amount by which your dependent variable changes
 when a predictor variable changes by one unit, while holding all other
 predictors constant. If an explanatory variable is a significant
-predictor of the dependent variable, it doesn&#39;t imply that the
+predictor of the dependent variable, it doesn’t imply that the
 explanatory variable is a cause of the dependent variable. In essence,
 regression can identify and establish a mathematical equation that best
 fits the observed data, allowing predictions and explanations of the
@@ -1950,7 +1950,7 @@ is a linear function of <code>PCTVACANT</code>, <code>PCTSINGLES</code>,
 <code>PCTBACHMOR</code>, and <code>LNNBELPOV1</code> where
 <code>MEDHVAL</code> represents the median value of all owner occupied
 housing units, <code>PCTBACHMOR</code> refers to the percentage of
-individuals with Bachelor&#39;s degrees or higher, <code>PCTVACANT</code> is
+individuals with Bachelor’s degrees or higher, <code>PCTVACANT</code> is
 the percentage of vacant houses, <code>LNNBELPOV100</code> means the
 number of households with incomes below 100% poverty level, and
 <code>PCTSINGLES</code> denotes the percentage of single family housing
@@ -1973,7 +1973,7 @@ true regression line (when ε &gt; 0) or below the line (when ε &lt;
 assumes that the relationship between the independent variable(s) and
 the dependent variable is always linear. A change in the independent
 variables is associated with a constant change in the dependent
-variable. We&#39;ll use scatter plots of the dependent variable and each of
+variable. We’ll use scatter plots of the dependent variable and each of
 the predictors to check this assumption. </p></li>
 <li><p>Independence of observations: The independence of observations
 assumption in regression means that the values of the dependent variable
@@ -1995,22 +1995,22 @@ be explained as unique events not likely to be repeated, then we may
 have cause to remove them. In some cases, however, it may be that the
 extreme values in the data provide the most useful information about
 values of some of the coefficients and/or provide the most realistic
-guide to the magnitudes of forecast errors. We&#39;ll make a histogram of
+guide to the magnitudes of forecast errors. We’ll make a histogram of
 the standardized residuals to see whether the residuals are
 normal.</p></li>
 <li><p>Homoscedasticity: Homoscedasticity refers to the assumption that
 the variability of the residuals, which are the differences between
 observed and predicted values, is constant across all levels of the
-independent variables. We&#39;ll use the Standardized Residual by Predicted
+independent variables. We’ll use the Standardized Residual by Predicted
 Value scatter plot to check homoscedasticity.</p></li>
 <li><p>No multicollinearity: The final assumption is
 non-multicollinearity. In other words, the predictors should not be very
 strongly correlated with each other. Multicollinearity is when two or
 more predictors are very strongly correlated with each other. In other
 words, it means little or no value will be added when we include a new
-predictor that&#39;s very similar to a predictor that is already in the
+predictor that’s very similar to a predictor that is already in the
 model. If multicollinearity is present, we may get unstable regression
-parameters. Here is a way to test multicollinearity: we&#39;ll use k as the
+parameters. Here is a way to test multicollinearity: we’ll use k as the
 number of predictors (in our case, k equals to 4). Since k&gt;2, it is
 possible that the pairwise correlations are small, and yet a linear
 dependence exists among three or even more variables. We can assess for
@@ -2125,7 +2125,7 @@ variables in the regression model.</p>
 <div id="hypotheses-test" class="section level4">
 <h4>2.3.5 Hypotheses Test</h4>
 <p>Our null hypothesis is that each particular predictor (the percentage
-of individuals with Bachelor&#39;s degrees or higher, the percentage of
+of individuals with Bachelor’s degrees or higher, the percentage of
 vacant houses, the number of households living in poverty, or the
 percentage of single family housing units) is not a significant
 predictor of the dependent variable (median house values in
@@ -2147,7 +2147,7 @@ significant. As in simple regression, the Null Hypothesis (H0) is that
 the predictor i is not associated with the dependent variable (i.e., the
 coefficient of predictor i, βi=0). The Alternative Hypothesis (Ha) is
 that βi≠0. In a regression with k predictors <span class="math inline">\(x_0, x_1, x_2, \ldots, x_k\)</span>, we do these
-tests for each predictor&#39;s corresponding coefficient <span class="math inline">\(\beta_0, \beta_1, \beta_2, \ldots,
+tests for each predictor’s corresponding coefficient <span class="math inline">\(\beta_0, \beta_1, \beta_2, \ldots,
 \beta_k\)</span>. If the p-value is less than the chosen significance
 level, there is evidence to reject the null hypothesis, suggesting a
 significant difference between the group means.</p>
@@ -2695,7 +2695,7 @@ lm2.cv</code></pre>
 <p>In this paper, we explored the relationship between median house
 values in Philadelphia and various neighborhood characteristics. Our
 findings from the regression analysis indicate that all the selected
-predictors—percentage of individuals with Bachelor&#39;s degrees or higher,
+predictors—percentage of individuals with Bachelor’s degrees or higher,
 percentage of vacant houses, number of households living in poverty, and
 percentage of single-family housing units—have significant associations
 with the median house values.</p>
@@ -2735,7 +2735,7 @@ power, the need for these methods is not immediate but could be explored
 in future research.</p>
 <p>Overall, our model shows promising results, but further research
 could explore alternative regression methods and additional predictors
-to potentially enhance the model&#39;s performance and address its current
+to potentially enhance the model’s performance and address its current
 limitations.</p>
 </div>
 <div id="citations" class="section level2">
